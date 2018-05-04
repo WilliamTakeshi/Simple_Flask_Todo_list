@@ -1,68 +1,51 @@
 from flask_restful import Resource, reqparse, marshal
 from models.task import TaskModel
 
-# task_fields = {
-#     'title': fields.String,
-#     'description': fields.String,
-#     'done': fields.Boolean,
-#     'uri': fields.Url('task')
-# }
-
 class TaskListAPI(Resource):
-
-    def __init__(self):
-        self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('title', type=str, required=True,
-                                   help='No task title provided',
-                                   location='json')
-        self.reqparse.add_argument('description', type=str, default="",
-                                   location='json')
-        super(TaskListAPI, self).__init__()
-
     def get(self):
-        return {'tasks': [marshal(task, task_fields) for task in tasks]}
+        return {'task': list(map(lambda x: x.json(), TaskModel.query.all()))}
 
     def post(self):
-        args = self.reqparse.parse_args()
-        task = {
-            'id': tasks[-1]['id'] + 1,
-            'title': args['title'],
-            'description': args['description'],
-            'done': False
-        }
-        tasks.append(task)
-        return {'task': marshal(task, task_fields)}, 201
+        args = TaskAPI.parser.parse_args()
+        task = TaskModel(**args)
+        try:
+            task.save_to_db()
+        except:
+            return {"message": "An error occurred creating the task."}, 500
+        return task.json(), 201
 
 
 class TaskAPI(Resource):
+    parser = reqparse.RequestParser()
+    parser.add_argument('title', type=str, location='json')
+    parser.add_argument('description', type=str, location='json')
+    parser.add_argument('done', type=bool, location='json')
 
-    def __init__(self):
-        self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('title', type=str, location='json')
-        self.reqparse.add_argument('description', type=str, location='json')
-        self.reqparse.add_argument('done', type=bool, location='json')
-        super(TaskAPI, self).__init__()
+    def get(self, _id):
+        task = TaskModel.find_by_id(_id)
+        if task:
+            return task.json()
+        return {'message': 'Task not found'}, 404
 
-    def get(self, id):
-        task = [task for task in tasks if task['id'] == id]
-        if len(task) == 0:
-            abort(404)
-        return {'task': marshal(task[0], task_fields)}
+    def put(self, _id):
+        data = self.parser.parse_args()
+        task = TaskModel.find_by_id(_id)
 
-    def put(self, id):
-        task = [task for task in tasks if task['id'] == id]
-        if len(task) == 0:
-            abort(404)
-        task = task[0]
-        args = self.reqparse.parse_args()
-        for k, v in args.items():
-            if v is not None:
-                task[k] = v
-        return {'task': marshal(task, task_fields)}
+        if task:
+            task.date_begin = data['date_begin']
+            task.date_end = data['date_end']
+            task.client_id = data['client_id']
+        else:
+            task = TaskModel(**data)
 
-    def delete(self, id):
-        task = [task for task in tasks if task['id'] == id]
-        if len(task) == 0:
-            abort(404)
-        tasks.remove(task[0])
-        return {'result': True}
+        task.save_to_db()
+
+        return task.json()
+
+    def delete(self, _id):
+        task = TaskModel.find_by_id(_id)
+        if task:
+            task.delete_from_db()
+            return {'message': 'Task deleted'}
+
+        return {'message': "There is no task with id '{}'".format(_id)}, 400
