@@ -17,9 +17,9 @@ class TaskListAPI(Resource):
 
 class TaskAPI(Resource):
     parser = reqparse.RequestParser()
-    parser.add_argument('title', type=str, location='json')
-    parser.add_argument('description', type=str, location='json')
-    parser.add_argument('done', type=bool, location='json')
+    parser.add_argument('title', type=str, required=False)
+    parser.add_argument('description', type=str, required=False)
+    parser.add_argument('done', type=bool, required=False)
 
     def get(self, _id):
         task = TaskModel.find_by_id(_id)
@@ -28,13 +28,14 @@ class TaskAPI(Resource):
         return {'message': 'Task not found'}, 404
 
     def put(self, _id):
+        
         data = self.parser.parse_args()
         task = TaskModel.find_by_id(_id)
 
         if task:
-            task.date_begin = data['date_begin']
-            task.date_end = data['date_end']
-            task.client_id = data['client_id']
+            task.title = data['title']
+            task.description = data['description']
+            task.done = data['done']
         else:
             task = TaskModel(**data)
 

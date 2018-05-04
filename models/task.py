@@ -6,7 +6,7 @@ class TaskModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(80), nullable=False)
     description = db.Column(db.String(255), nullable=True)
-    done = db.Column(db.Boolean, default=True, nullable=False)
+    done = db.Column(db.Boolean, default=False, nullable=False)
 
     def __init__(self, title, description, done):
         self.title = title
