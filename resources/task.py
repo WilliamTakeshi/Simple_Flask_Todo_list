@@ -14,7 +14,6 @@ class TaskListAPI(Resource):
             return {"message": "An error occurred creating the task."}, 500
         return task.json(), 201
 
-
 class TaskAPI(Resource):
     parser = reqparse.RequestParser()
     parser.add_argument('title', type=str, required=False)

@@ -30,8 +30,8 @@ def task():
     return render_template('public/task.html', form=form)
 
 
-api.add_resource(TaskListAPI, '/v0/task')
-api.add_resource(TaskAPI, '/v0/task/<_id>')
+api.add_resource(TaskListAPI, '/v0/task', endpoint="api.task")
+api.add_resource(TaskAPI, '/v0/task/<_id>', endpoint="api.tasks")
 
 if __name__ == '__main__':
     from db import db
