@@ -1,0 +1,68 @@
+
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="row">
+  <div class="column-12 mx-auto">
+    <h1>To do List</h1>
+    <hr/>
+    <div class="row">
+    <div class="column-6">
+      <h1>To Do</h1>
+        <ul>
+        {% for task in form.tasknotdone %}
+          <span id="taskrow{{task.id}}">
+            <li>
+              <p>{{ task.title }} {{ task.done }}
+              <a href="#UpdateTaskModal" data-toggle="modal" data-id="{{ task.id }}" data-title="{{ task.title }}"
+              data-description="{{ task.description }}">Edit</a><span class="deletetask" onclick='deleteTask("{{ task.id }}")'>&times;</span></p>
+            </li>
+              <p>{{ task.description }}</p>
+          </span>
+        {% endfor %}
+        </ul>
+        <button id="CreateTaskBtn" class='btn btn-success'>Novo To do</button>
+    </div>
+    <div class="column-6">
+      <h1>Feito</h1>
+      <ul>
+        {% for task in form.taskdone %}
+        <li>
+          <p>{{ task.title }} {{ task.done }}</p></li>
+          <p>{{ task.description }}</p>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  </div>
+</div>
+
+
+<div id="CreateTaskModal" class="modal">
+  <!-- Modal content -->
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <form id="form-create-todo" method="POST">
+      Title: <input type="text" name="title"><br>
+      Description: <input type="text" name="description"><br>
+      <input type="submit" value="Submit">
+    </form> 
+  </div>
+</div>
+
+<div id="UpdateTaskModal" class="modal">
+  <!-- Modal content -->
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <form id="form-update-todo" method="PUT">
+      <input type="hidden" name="id"><br>
+      Title: <input type="text" name="title" value=''><br>
+      Description: <input type="text" name="description" value=''><br>
+      <input type="radio" name="done" value="" checked> Não Feito
+        <input type="radio" name="done" value="true"> Feito<br>
+      <input type="submit" value="Submit">
+    </form> 
+  </div>
+</div>
+{% endblock %}
+
