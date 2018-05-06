@@ -26,7 +26,6 @@ def task():
     tasks_not_done = TaskModel.query.filter_by(done=False)
     form = {"taskdone": tasks_done,
             "tasknotdone": tasks_not_done}
-    print(form)
     return render_template('public/task.html', form=form)
 
 

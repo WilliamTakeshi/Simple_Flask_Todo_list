@@ -27,7 +27,6 @@ class TaskAPI(Resource):
         return {'message': 'Task not found'}, 404
 
     def put(self, _id):
-        
         data = self.parser.parse_args()
         task = TaskModel.find_by_id(_id)
 
@@ -37,7 +36,6 @@ class TaskAPI(Resource):
             task.done = data['done']
         else:
             task = TaskModel(**data)
-
         task.save_to_db()
 
         return task.json()
